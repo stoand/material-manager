@@ -15,7 +15,7 @@ exports.createUser = function (req, res) {
 }
 
 exports.listUsers = function (req, res) {
-    req.db.query('SELECT phone, email, type, joined, lastactive, name_en, name_ar FROM users', (err, rows) => {
+    req.db.query('SELECT id, phone, email, type, joined, lastactive, name_en, name_ar FROM users ORDER BY LOWER(name_en)', (err, rows) => {
         if (err) {
             res.status(500);
             res.send({ error: 'unknown' })
@@ -26,17 +26,17 @@ exports.listUsers = function (req, res) {
 }
 
 exports.updateUser = function (req, res) {
-    let user = req.body;
-    let query = `UPDATE users SET phone = ?, email = ?, password = ?, type = ?, name_en = ?, name_ar = ?
+    let user = req.body.user;
+    let query = `UPDATE users SET phone = ?, email = ?, password = IFNULL(?, users.password), type = ?, name_en = ?, name_ar = ?
         WHERE users.id = ?`;
 
-    req.db.query(query, [user.phone, user.email, user.password, user.type, user.name_ar, user.name_en, user.id],
+    req.db.query(query, [user.phone, user.email, user.password, user.type, user.name_en, user.name_ar, user.id],
         function (err, rows) {
             if (err) {
                 res.status(400);
                 res.send({ error: 'invalid_format' })
             } else {
-                res.send({ user: rows[0] });
+                res.send({ success: true });
             }
         });
 };

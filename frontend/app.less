@@ -1,2 +1,19 @@
 @import "~skeleton-css/css/normalize.css";
 @import "~skeleton-css/css/skeleton.css";
+
+.edited-field__input {
+    margin-bottom: 0;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #999;
+}
+
+.edited-field__revert {
+    margin-left: 15px;
+}
+
+.edited-field__save[disabled],
+.edited-field__revert[disabled] {
+    cursor: default;
+    color: #999;
+}

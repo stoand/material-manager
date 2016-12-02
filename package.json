@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack-dev-server --inline --hot"
+    "start": "webpack-dev-server --inline --hot",
+    "backend": "nodemon backend/backend.js",
+    "build": "webpack -p"
   },
   "author": "",
   "license": "ISC",
