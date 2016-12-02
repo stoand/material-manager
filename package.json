@@ -1,0 +1,38 @@
+{
+  "name": "material-manager",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack-dev-server --inline --hot"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/es6-promise": "0.0.32",
+    "@types/react": "^0.14.52",
+    "@types/react-dom": "^0.14.19",
+    "@types/whatwg-fetch": "0.0.32",
+    "body-parser": "^1.15.2",
+    "css-loader": "^0.26.0",
+    "dotenv": "^2.0.0",
+    "es6-promise": "^4.0.5",
+    "express": "^4.14.0",
+    "html-webpack-plugin": "^2.24.1",
+    "less": "^2.7.1",
+    "less-loader": "^2.2.3",
+    "mobx": "^2.6.3",
+    "mobx-react": "^4.0.3",
+    "mysql": "^2.12.0",
+    "react": "^15.4.1",
+    "react-dom": "^15.4.1",
+    "skeleton-css": "^2.0.4",
+    "style-loader": "^0.13.1",
+    "ts-loader": "^1.2.2",
+    "typescript": "^2.0.10",
+    "webpack": "^1.13.3",
+    "webpack-dev-server": "^1.16.2",
+    "whatwg-fetch": "^2.0.1"
+  }
+}
