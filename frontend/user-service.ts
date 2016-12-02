@@ -3,6 +3,13 @@ import { authService } from './auth-service';
 import { req } from './api';
 
 class UserService {
+    userTypes = {
+        1: 'Admin',
+        2: 'Material Entry',
+        3: 'Driver',
+        4: 'Client',
+    };
+
     @observable users = [];
     @observable editing = [];
     @observable newUser = {
@@ -62,6 +69,24 @@ class UserService {
         this.editing.push({ user, field, editedValue: user[field], saving: false, error: '' });
     }
 
+    @action deleteUser(user) {
+        if (window.confirm(`Delete user ${user.name_en} (${user.name_ar}) ?`)) {
+            req('/api/admin/user/delete', { user }).then(data => {
+                this.loadUsers();
+            });
+        }
+    }
+
+    resetPassword(user) {
+        req('/api/admin/user/reset-password', { user }).then(data => {
+            if (data.error) {
+                alert('Unable to send email');
+            } else {
+                alert('Email with credentials sent to ' + user.email);
+            }
+        });
+    }
+
     @action createNew() {
         if (Object.keys(this.newUser).filter(field => this.newUser[field] != 'phone' && this.newUser[field] == '').length > 0) {
             this.newUserError = 'No fields may be empty';
@@ -73,7 +98,9 @@ class UserService {
                 if (data.error) {
                     this.newUserError = data.error === 'email_not_unique' ? 'Email not Unique' : 'Unknown Error';
                 } else {
+                    let email = this.newUser.email;
                     this.loadUsers();
+                    alert('Email with credentials sent to ' + this.newUser.email);
                 }
             });
         }

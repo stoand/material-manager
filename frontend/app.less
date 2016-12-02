@@ -1,11 +1,14 @@
 @import "~skeleton-css/css/normalize.css";
 @import "~skeleton-css/css/skeleton.css";
 
-.edited-field__input {
+.edited-field__input[type] {
     margin-bottom: 0;
     width: 100%;
     box-sizing: border-box;
     border: 1px solid #999;
+    border-radius: 0;
+    padding: 0 !important;
+    height: auto;
 }
 
 .edited-field__revert {
@@ -28,4 +31,13 @@ a[disabled] {
     padding: 10px 0;
     height: 2rem;
     font-size: 2rem;
+}
+
+.user-row td {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.user-row__delete {
+    text-align: right;
 }

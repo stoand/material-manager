@@ -1,3 +1,7 @@
+let https = require('https');
+let process = require('process');
+let crypto = require('crypto');
+
 function userWithEmailExists(db, id, email, callback) {
     if (!email) {
         callback(undefined, false);
@@ -10,6 +14,73 @@ function userWithEmailExists(db, id, email, callback) {
             }
         });
     }
+}
+
+exports.resetPassword = function (req, res) {
+    let user = req.body.user;
+    sendNewPassword(req.db, user, (err) => {
+        if (err) {
+            res.status(500);
+            res.send({ error: 'unknown' })
+        } else {
+            res.send({ success: true });
+        }
+    });
+}
+
+function sendNewPassword(db, user, callback) {
+    crypto.randomBytes(8, (err, bytes) => {
+        let email = user.email;
+        let password = bytes.toString('hex');
+
+        let postData = JSON.stringify({
+            "personalizations": [
+                {
+                    "to": [
+                        {
+                            email
+                        }
+                    ],
+                    "subject": "BE Material Manager Credentials"
+                }
+            ],
+            "from": {
+                "email": "gm@be.jo"
+            },
+            "content": [
+                {
+                    "type": "text/html",
+                    "value": `Hello,<br><br>
+                    below are your new credentials for logging in to <a target="_blank" href='www.be.jo/materialmanager'>be.jo/materialmanager</a>:
+                    <br><br><b>Email:</b> ${email}<br> <b>Password:</b> ${password}<br>`
+                }
+            ]
+        });
+
+        let options = {
+            host: 'api.sendgrid.com',
+            port: '443',
+            path: '/v3/mail/send',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + process.env.SENDGRID_KEY,
+                'Content-Length': Buffer.byteLength(postData)
+            }
+        };
+
+        let req = https.request(options, (res) => {
+            if (res.statusCode === 202) {
+                db.query('UPDATE users SET password = ? WHERE email = ? LIMIT 1', [password, email], (err, res) => {
+                    callback(err, res);
+                });
+            } else {
+                callback(true);
+            }
+        });
+        req.write(postData);
+        req.end();
+    });
 }
 
 exports.createUser = function (req, res) {
@@ -27,14 +98,15 @@ exports.createUser = function (req, res) {
             let query = `INSERT INTO users(phone, email, password, type, joined, lastactive, name_en, name_ar)
                 VALUES (?,?,?,?,?,?,?,?);`;
 
-            req.db.query(query, [user.phone, user.email, user.password || 1234, user.type, new Date(),
+            req.db.query(query, [user.phone, user.email, '', user.type, new Date(),
             new Date(), user.name_en, user.name_ar], function (err, rows) {
                 if (err) {
-                    console.log(err);
                     res.status(400);
                     res.send({ error: 'invalid_format' })
                 } else {
-                    res.send({ user: rows[0] });
+                    sendNewPassword(req.db, user, (err) => {
+                        res.send({ user: rows[0] });
+                    });
                 }
             });
         }
@@ -42,12 +114,27 @@ exports.createUser = function (req, res) {
 }
 
 exports.listUsers = function (req, res) {
-    req.db.query('SELECT id, phone, email, type, joined, lastactive, name_en, name_ar FROM users ORDER BY LOWER(name_en)', (err, rows) => {
+    req.db.query(`SELECT users.id, phone, email, type, joined, lastactive, name_en, name_ar, COUNT(DISTINCT transactions.id) as transactions FROM users 
+            LEFT JOIN transactions ON transactions.customer = users.id OR transactions.driver = users.id
+             GROUP BY users.id ORDER BY LOWER(name_en)`, (err, rows) => {
+            if (err) {
+                console.log(err);
+                res.status(500);
+                res.send({ error: 'unknown' })
+            } else {
+                res.send({ users: rows });
+            }
+        });
+}
+
+exports.deleteUser = function (req, res) {
+    let user = req.body.user;
+    req.db.query('DELETE FROM users WHERE id = ?', [user.id], (err, rows) => {
         if (err) {
             res.status(500);
             res.send({ error: 'unknown' })
         } else {
-            res.send({ users: rows });
+            res.send({ success: true });
         }
     });
 }

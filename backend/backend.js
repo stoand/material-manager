@@ -31,6 +31,9 @@ app.post('/api/login', auth.login);
 app.post('/api/admin/user/create', admin.createUser);
 app.post('/api/admin/user/update', admin.updateUser);
 app.post('/api/admin/user/list', admin.listUsers);
+app.post('/api/admin/user/delete', admin.deleteUser);
+app.post('/api/admin/user/reset-password', admin.resetPassword);
+
 
 app.listen(3000, function () {
     console.log('Example app listening on port 3000!')
