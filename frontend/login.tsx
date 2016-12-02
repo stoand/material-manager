@@ -25,6 +25,6 @@ export const Login = observer(() =>
             </div>
         </form>
 
-        {authService.authError ? <div>Invalid Credentials</div> : <div></div>}
+        {authService.authError ? <div className="form-error">Invalid Credentials</div> : <div></div>}
     </section>
 );

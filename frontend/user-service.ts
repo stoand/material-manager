@@ -5,6 +5,15 @@ import { req } from './api';
 class UserService {
     @observable users = [];
     @observable editing = [];
+    @observable newUser = {
+        name_en: '',
+        name_ar: '',
+        phone: '',
+        email: '',
+        type: 4,
+    };
+    @observable newUserError = '';
+    @observable savingNewUser = false;
 
     @observable email = '';
     @observable password = '';
@@ -32,10 +41,16 @@ class UserService {
         edit.saving = true;
 
         req('/api/admin/user/update', { user: edit.user }).then(data => {
-            if (!data.success) {
-                edit.user[edit.field] = previousValue;
+            edit.saving = false;
+            if (data.error == 'email_not_unique') {
+                edit.error = 'Email not Unique'
+            } else {
+                if (!data.success) {
+                    edit.user[edit.field] = previousValue;
+                } else {
+                    this.editing.remove(edit);
+                }
             }
-            this.editing.remove(edit);
         });
     }
 
@@ -44,9 +59,24 @@ class UserService {
     }
 
     @action editField(user, field) {
-        this.editing.push({ user, field, editedValue: user[field], saving: false });
-        console.log(this.editing);
+        this.editing.push({ user, field, editedValue: user[field], saving: false, error: '' });
+    }
 
+    @action createNew() {
+        if (Object.keys(this.newUser).filter(field => this.newUser[field] != 'phone' && this.newUser[field] == '').length > 0) {
+            this.newUserError = 'No fields may be empty';
+        } else {
+            this.newUserError = '';
+            this.savingNewUser = true;
+            req('/api/admin/user/create', { user: this.newUser }).then(data => {
+                this.savingNewUser = false;
+                if (data.error) {
+                    this.newUserError = data.error === 'email_not_unique' ? 'Email not Unique' : 'Unknown Error';
+                } else {
+                    this.loadUsers();
+                }
+            });
+        }
     }
 }
 

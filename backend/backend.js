@@ -10,12 +10,15 @@ let admin = require('./admin');
 
 app.use(bodyParser.json());
 app.use((req, res, next) => {
-    console.log('got req:', req.path);
     req.db = mysql.createConnection({
         host: process.env.DB_HOST,
         user: process.env.DB_USER,
         password: process.env.DB_PASSWORD,
         database: process.env.DB_DATABASE_NAME,
+    });
+
+    res.on('finish', function () {
+        req.db.destroy();
     });
 
     next();

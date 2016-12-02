@@ -10,7 +10,7 @@ export const req = (url, reqData = {}) => {
         .then(data => {
             if (data.error) {
                 if (data.error == 'unauthorized') authService.authToken = undefined;
-                return {};
+                return data;
             } else {
                 return data;
             }

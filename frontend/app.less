@@ -12,8 +12,20 @@
     margin-left: 15px;
 }
 
-.edited-field__save[disabled],
-.edited-field__revert[disabled] {
+a[disabled] {
     cursor: default;
     color: #999;
+    text-decoration: none;
+}
+
+.edited-field__error {
+    color: red;
+    padding-left: 10px;
+}
+
+.form-error {
+    color: red;
+    padding: 10px 0;
+    height: 2rem;
+    font-size: 2rem;
 }
