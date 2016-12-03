@@ -8,6 +8,8 @@ let process = require('process');
 let auth = require('./auth');
 let admin = require('./admin');
 
+app.use('/', express.static('dist'));
+
 app.use(bodyParser.json());
 app.use((req, res, next) => {
     req.db = mysql.createConnection({
@@ -24,8 +26,8 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use(auth.authorize);
-app.use('/api/admin', auth.authorizeAdmin);
+app.post(auth.authorize);
+app.post('/api/admin', auth.authorizeAdmin);
 
 app.post('/api/login', auth.login);
 app.post('/api/admin/user/create', admin.createUser);
