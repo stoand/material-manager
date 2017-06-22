@@ -33,7 +33,7 @@ exports.login = (req, res) => {
             let expires = new Date(new Date().setMinutes(new Date().getMinutes() + loginDuration));
             let token = bytes.toString('hex');
             req.db.query(`INSERT INTO tokens (\`user\`, \`value\`, \`expires\`, \`action\`)
-            SELECT users.id, ?, ?, ? FROM users WHERE users.email = ? AND users.password = ? LIMIT 1`,
+            SELECT users.id, ?, ?, ? FROM users WHERE users.email = ? AND users.password = ? AND (users.type = 1 OR users.type = 2) LIMIT 1`,
                 [token, expires, 0, req.body.email, req.body.password], (err, rows) => {
                     if (rows && rows.affectedRows) {
                         getUser(req.db, token, (err, rows) => {
