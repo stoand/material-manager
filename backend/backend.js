@@ -37,6 +37,6 @@ app.post('/api/admin/user/delete', admin.deleteUser);
 app.post('/api/admin/user/reset-password', admin.resetPassword);
 
 
-app.listen(3000, function () {
-    console.log('Example app listening on port 3000!')
+app.listen(6666, function () {
+    console.log('App listening on port 6666!')
 });

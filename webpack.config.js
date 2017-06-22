@@ -19,7 +19,8 @@ module.exports = {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            title: 'Material Manager'
+            title: 'Material Manager',
+            hash: true,
         }),
         new webpack.ProvidePlugin({
             React: 'react',

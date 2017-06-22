@@ -1,9 +1,9 @@
 import { authService } from './auth-service';
 
 export const req = (url, reqData = {}) => {
-    return fetch(url, {
+    return fetch('./proxy.php', {
         method: 'POST',
-        headers: new Headers({ 'Content-Type': 'application/json', 'Auth-Token': localStorage.getItem('authToken') }),
+        headers: new Headers({ 'X-Proxy-URL': url, 'Content-Type': 'application/json', 'Auth-Token': localStorage.getItem('authToken') }),
         body: JSON.stringify(reqData),
     })
         .then(response => response.json())
