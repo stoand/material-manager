@@ -15,7 +15,7 @@ class AuthService {
     @action login() {
         this.authError = false;
 
-        fetch('./proxy.php', {
+        fetch(PROXY ? './proxy.php' : '/api/login', {
             method: 'POST',
             headers: new Headers({ 'X-Proxy-URL': '/api/login', 'Content-Type': 'application/json' }),
             body: JSON.stringify({ email: this.email, password: this.password }),

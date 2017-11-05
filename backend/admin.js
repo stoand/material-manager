@@ -114,7 +114,7 @@ exports.createUser = function (req, res) {
 }
 
 exports.listUsers = function (req, res) {
-    req.db.query(`SELECT users.id, phone, email, type, joined, lastactive, name_en, name_ar, COUNT(DISTINCT transactions.id) as transactions FROM users 
+    req.db.query(`SELECT users.id, phone, email, type, joined, lastactive, name_en, name_ar, parent_customer, COUNT(DISTINCT transactions.id) as transactions FROM users 
             LEFT JOIN transactions ON transactions.customer = users.id OR transactions.driver = users.id
              GROUP BY users.id ORDER BY LOWER(name_en)`, (err, rows) => {
             if (err) {
@@ -152,10 +152,10 @@ exports.updateUser = function (req, res) {
                 res.send({ error: 'email_not_unique' });
             }
         } else {
-            let query = `UPDATE users SET phone = ?, email = ?, password = IFNULL(?, users.password), type = ?, name_en = ?, name_ar = ?
+            let query = `UPDATE users SET phone = ?, email = ?, password = IFNULL(?, users.password), type = ?, name_en = ?, name_ar = ?, parent_customer = ?
         WHERE users.id = ?`;
 
-            req.db.query(query, [user.phone, user.email, user.password, user.type, user.name_en, user.name_ar, user.id],
+            req.db.query(query, [user.phone, user.email, user.password, user.type, user.name_en, user.name_ar, user.parent_customer || null, user.id],
                 function (err, rows) {
                     if (err) {
                         res.status(400);

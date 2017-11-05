@@ -66,7 +66,9 @@ class UserService {
     }
 
     @action editField(user, field) {
-        this.editing.push({ user, field, editedValue: user[field], saving: false, error: '' });
+        let edit = { user, field, editedValue: user[field], saving: false, error: '' };
+        this.editing.push(edit);
+        return edit;
     }
 
     @action deleteUser(user) {

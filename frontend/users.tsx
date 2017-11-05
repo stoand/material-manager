@@ -8,19 +8,36 @@ const editOnChange = (object, property) => event => {
 }
 
 export const Users = observer(() => {
-    const EditableField = observer(({object, property, type}: any) => {
+    const EditableField = observer(({ object, property, type }: any) => {
         if (!type) type = 'text';
 
         let edit = userService.isEditing(object, property);
 
+        function saveArray(newVal) {
+            let edit = userService.editField(object, property);
+            edit.editedValue = newVal;
+            userService.saveEdit(edit);
+        }
+
+        if (type === 'array') {
+            return <td>
+                <select onChange={e => saveArray(e.target.value) } value={object.parent_customer || ''} className="u-full-width">
+                    <option value=''>-</option>
+                    {userService.users.map(user => <option key={user.id} value={user.id}>{user.name_en}</option>)}
+                </select>
+            </td>;
+        }
+
         return !edit ?
-            <td>{object[property] == '' ? '-' : object[property]}<br />
-                <a href="" onClick={e => { e.preventDefault(); userService.editField(object, property) } }>Edit</a>
+            <td>
+                {object[property] == '' ? '-' : object[property]}<br />
+                <a href="" onClick={e => { e.preventDefault(); userService.editField(object, property) }}>Edit</a>
             </td> :
             <td className="edited-field">
-                <input type={type} disabled={edit.saving} className="edited-field__input" defaultValue={edit.editedValue} onChange={e => { e.preventDefault(); edit.editedValue = e.target.value } } />
-                <a disabled={edit.saving} href="" onClick={e => { e.preventDefault(); userService.saveEdit(edit) } } className="edited-field__save">Save</a>
-                <a disabled={edit.saving} href="" onClick={e => { e.preventDefault(); userService.revertEdit(edit) } } className="edited-field__revert">Revert</a>
+                <input type={type} disabled={edit.saving} className="edited-field__input" defaultValue={edit.editedValue} onChange={e => { e.preventDefault(); edit.editedValue = e.target.value }} />
+
+                <a disabled={edit.saving} href="" onClick={e => { e.preventDefault(); userService.saveEdit(edit) }} className="edited-field__save">Save</a>
+                <a disabled={edit.saving} href="" onClick={e => { e.preventDefault(); userService.revertEdit(edit) }} className="edited-field__revert">Revert</a>
                 <span className="edited-field__error">{edit.error}</span>
             </td>;
     });
@@ -33,7 +50,7 @@ export const Users = observer(() => {
             <br />
             <h3>Manage Users</h3>
 
-            <form onSubmit={e => { e.preventDefault(); userService.createNew() } }>
+            <form onSubmit={e => { e.preventDefault(); userService.createNew() }}>
                 <div className="row">
                     <div className="four columns">
                         <label htmlFor="new-user-email">Email</label>
@@ -78,6 +95,7 @@ export const Users = observer(() => {
                         <th>Name (ar)</th>
                         <th>Email</th>
                         <th>Phone</th>
+                        <th>Parent Customer</th>
                         <th>Transactions</th>
                         <th>Type</th>
                     </tr>
@@ -90,15 +108,16 @@ export const Users = observer(() => {
                                 <EditableField object={user} property={"name_ar"} />
                                 <EditableField object={user} property={"email"} type="email" />
                                 <EditableField object={user} property={"phone"} />
+                                {user.type == 4 ? <EditableField object={user} property={"parent_customer"} type="array" /> : <td></td>}
                                 <td>{user.transactions}</td>
                                 <td>{userService.userTypes[user.type]}</td>
                             </tr>,
                             <tr>
                                 <td colSpan={4}>
-                                    <a href="" disabled={!user.email} onClick={e => {e.preventDefault(); userService.resetPassword(user)}}>Send new Password {!user.email && "(Email Missing)"}</a>
+                                    <a href="" disabled={!user.email} onClick={e => { e.preventDefault(); userService.resetPassword(user) }}>Send new Password {!user.email && "(Email Missing)"}</a>
                                 </td>
                                 <td colSpan={2} className="user-row__delete">
-                                    <a href="" onClick={e => {e.preventDefault(); userService.deleteUser(user)}}>Delete User</a>
+                                    <a href="" onClick={e => { e.preventDefault(); userService.deleteUser(user) }}>Delete User</a>
                                 </td>
                             </tr>
                         ]

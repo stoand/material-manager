@@ -13,8 +13,7 @@ module.exports = {
     module: {
         loaders: [
             { test: /\.less$/, loader: "style-loader!css-loader!less-loader" },
-            // all files with a `.ts` or `.tsx` extension will be handled by `ts-loader`
-            { test: /\.tsx?$/, loader: 'ts-loader' }
+            { test: /\.tsx?$/, loader: 'ts-loader?transpileOnly=true' }
         ]
     },
     plugins: [
@@ -25,11 +24,14 @@ module.exports = {
         new webpack.ProvidePlugin({
             React: 'react',
         }),
+        new webpack.DefinePlugin({
+            PROXY: JSON.stringify(true),
+        })
     ],
     devServer: {
         proxy: {
             '/api': {
-                target: 'http://localhost:3000',
+                target: 'http://localhost:6666',
                 secure: false,
             }
         }
